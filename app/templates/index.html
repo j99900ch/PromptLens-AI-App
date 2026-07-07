@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>🚀 PromptLens AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- PWA -->
+
+    <link rel="manifest"
+          href="{{ url_for('static', filename='manifest.json') }}">
+
+    <meta name="theme-color"
+          content="#2563eb">
+
+    <link rel="apple-touch-icon"
+          href="{{ url_for('static', filename='icon-192.png') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- =========================
+            HEADER
+    ========================== -->
+
+    <header>
+
+        <h1>🚀 PromptLens AI</h1>
+
+        <p class="subtitle">
+
+            Generate Better Prompts • Evaluate Quality • Improve AI Results
+
+        </p>
+
+    </header>
+
+    <!-- =========================
+            INPUT FORM
+    ========================== -->
+
+    <form
+        method="POST"
+        id="promptForm">
+
+        <textarea
+            id="prompt"
+            name="prompt"
+            rows="8"
+            placeholder="Describe the prompt you want to improve..."
+            required>{{ prompt if prompt else "" }}</textarea>
+
+        <button
+            type="submit"
+            id="submitBtn">
+
+            ✨ Optimize Prompt
+
+        </button>
+
+    </form>
+
+    <!-- =========================
+            ERROR MESSAGE
+    ========================== -->
+
+    {% if error %}
+
+    <div class="error-card">
+
+        {{ error }}
+
+    </div>
+
+    {% endif %}
+
+    <!-- =========================
+            RESULTS
+    ========================== -->
+
+    {% if generation %}
+
+    <div class="results">
+
+                <!-- =========================
+                GENERATION
+        ========================== -->
+
+        <div class="card">
+
+            <h2>🎯 Objective</h2>
+
+            <p>{{ generation.objective }}</p>
+
+            <h2>✨ Optimized Prompt</h2>
+
+            <pre>{{ generation.optimized_prompt }}</pre>
+
+            <h2>🚀 Improvements</h2>
+
+            <ul>
+
+                {% for item in generation.improvements %}
+
+                <li>{{ item }}</li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+        <!-- =========================
+                EVALUATION
+        ========================== -->
+
+        <div class="card">
+
+            <h2>📊 Evaluation</h2>
+
+            <div class="score-badge">
+
+                {{ evaluation.score }}/10
+
+            </div>
+
+            <h3>✅ Strengths</h3>
+
+            <ul>
+
+                {% for item in evaluation.strengths %}
+
+                <li>{{ item }}</li>
+
+                {% endfor %}
+
+            </ul>
+
+            <h3>⚠️ Weaknesses</h3>
+
+            <ul>
+
+                {% for item in evaluation.weaknesses %}
+
+                <li>{{ item }}</li>
+
+                {% endfor %}
+
+            </ul>
+
+            <h3>💡 Suggestions</h3>
+
+            <ul>
+
+                {% for item in evaluation.suggestions %}
+
+                <li>{{ item }}</li>
+
+                {% endfor %}
+
+            </ul>
+
+            {% if evaluation.recommended_lines %}
+
+            <h3>📝 Ready-to-Add Prompt Lines</h3>
+
+            <p class="section-note">
+
+                Copy and add these lines directly to your prompt.
+
+            </p>
+
+            <div class="recommended-lines">
+
+                {% for line in evaluation.recommended_lines %}
+
+                <div class="copy-line">
+
+                    {{ line }}
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+        <!-- =========================
+            AI REDESIGNED PROMPTS
+    ========================== -->
+
+    {% if redesign %}
+
+    <div class="card" style="margin-top:35px;">
+
+        <h2>🚀 AI Redesigned Prompts</h2>
+
+        <p class="section-note">
+
+            Choose one of these AI-generated prompt versions.
+
+        </p>
+
+        <!-- =========================
+                Professional Version
+        ========================== -->
+
+        <div class="redesign-card">
+
+            <h3>
+
+                💼 {{ redesign.professional.title }}
+
+                ({{ redesign.professional.score }}/10)
+
+            </h3>
+
+            <pre id="professionalPrompt">{{ redesign.professional.prompt }}</pre>
+
+            <div class="action-buttons">
+
+                <button
+                    type="button"
+                    onclick="copyPrompt('professionalPrompt')">
+
+                    📋 Copy
+
+                </button>
+
+                <button
+                    type="button"
+                    onclick="downloadPrompt(
+                        '{{ redesign.professional.title }}',
+                        document.getElementById('professionalPrompt').innerText
+                    )">
+
+                    📥 Download
+
+                </button>
+
+                <button
+                    type="button"
+                    onclick="sharePrompt('professionalPrompt')">
+
+                    📤 Share
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <br>
+
+        <!-- =========================
+                Expert Version
+        ========================== -->
+
+        <div class="redesign-card">
+
+            <h3>
+
+                ⭐ {{ redesign.expert.title }}
+
+                ({{ redesign.expert.score }}/10)
+
+            </h3>
+
+            <pre id="expertPrompt">{{ redesign.expert.prompt }}</pre>
+
+            <div class="action-buttons">
+
+                <button
+                    type="button"
+                    onclick="copyPrompt('expertPrompt')">
+
+                    📋 Copy
+
+                </button>
+
+                <button
+                    type="button"
+                    onclick="downloadPrompt(
+                        '{{ redesign.expert.title }}',
+                        document.getElementById('expertPrompt').innerText
+                    )">
+
+                    📥 Download
+
+                </button>
+
+                <button
+                    type="button"
+                    onclick="sharePrompt('expertPrompt')">
+
+                    📤 Share
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    {% endif %}
+
+    <!-- =========================
+            PROMPT HISTORY
+    ========================== -->
+
+    <div class="history-section">
+
+        <h2>🕘 Prompt History</h2>
+
+        <p class="section-note">
+
+            Your last prompts are saved automatically in this browser.
+
+        </p>
+
+        <button
+            type="button"
+            class="clear-btn"
+            onclick="clearHistory()">
+
+            🗑 Clear History
+
+        </button>
+
+        <div id="history-list"></div>
+
+    </div>
+
+</div>
+
+<!-- =========================
+        JavaScript
+========================= -->
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+    loadHistory();
+
+    const form = document.getElementById("promptForm");
+    const button = document.getElementById("submitBtn");
+
+    if (form && button) {
+
+        form.addEventListener("submit", function () {
+
+            button.disabled = true;
+            button.innerHTML = "⏳ Optimizing Prompt...";
+
+        });
+
+    }
+
+});
+
+
+// ==========================
+// Toast
+// ==========================
+
+function showToast(message) {
+
+    let toast = document.getElementById("toast");
+
+    if (!toast) {
+
+        toast = document.createElement("div");
+
+        toast.id = "toast";
+
+        toast.className = "toast";
+
+        document.body.appendChild(toast);
+
+    }
+
+    toast.innerHTML = message;
+
+    toast.classList.add("show");
+
+    setTimeout(function () {
+
+        toast.classList.remove("show");
+
+    }, 2500);
+
+}
+
+
+// ==========================
+// Copy
+// ==========================
+
+function copyPrompt(id) {
+
+    const text = document.getElementById(id).innerText;
+
+    navigator.clipboard.writeText(text);
+
+    showToast("✅ Prompt copied");
+
+}
+
+
+// ==========================
+// Download
+// ==========================
+
+function downloadPrompt(title, text) {
+
+    const blob = new Blob([text], {
+
+        type: "text/plain"
+
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+
+    a.download = title + ".txt";
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+    showToast("📥 Download started");
+
+}
+
+
+// ==========================
+// Share
+// ==========================
+
+async function sharePrompt(id) {
+
+    const text = document.getElementById(id).innerText;
+
+    if (navigator.share) {
+
+        try {
+
+            await navigator.share({
+
+                title: "PromptLens AI",
+
+                text: text
+
+            });
+
+            showToast("📤 Shared");
+
+        }
+
+        catch (err) {
+
+            console.log(err);
+
+        }
+
+    }
+
+    else {
+
+        copyPrompt(id);
+
+    }
+
+}
+
+
+// ==========================
+// Prompt History
+// ==========================
+
+const promptBox = document.getElementById("prompt");
+
+const historyList = document.getElementById("history-list");
+
+
+function loadHistory() {
+
+    if (!historyList) return;
+
+    const history = JSON.parse(
+
+        localStorage.getItem("promptHistory")
+
+    ) || [];
+
+    historyList.innerHTML = "";
+
+    history.slice().reverse().forEach(function (item) {
+
+        const div = document.createElement("div");
+
+        div.className = "history-item";
+
+        div.innerHTML = item;
+
+        div.onclick = function () {
+
+            promptBox.value = item;
+
+        };
+
+        historyList.appendChild(div);
+
+    });
+
+}
+
+
+document.getElementById("promptForm").addEventListener("submit", function () {
+
+    const prompt = promptBox.value.trim();
+
+    if (prompt === "") return;
+
+    let history = JSON.parse(
+
+        localStorage.getItem("promptHistory")
+
+    ) || [];
+
+    history.push(prompt);
+
+    history = [...new Set(history)];
+
+    if (history.length > 10) {
+
+        history = history.slice(-10);
+
+    }
+
+    localStorage.setItem(
+
+        "promptHistory",
+
+        JSON.stringify(history)
+
+    );
+
+});
+
+
+function clearHistory() {
+
+    localStorage.removeItem("promptHistory");
+
+    loadHistory();
+
+    showToast("🗑 History Cleared");
+
+}
+
+
+// ==========================
+// Register Service Worker
+// ==========================
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener("load", function () {
+
+        navigator.serviceWorker.register("/static/service-worker.js")
+
+            .then(function () {
+
+                console.log("✅ Service Worker Registered");
+
+            })
+
+            .catch(function (err) {
+
+                console.log("Service Worker Error:", err);
+
+            });
+
+    });
+
+}
+
+</script>
+
+</body>
+
+</html>
